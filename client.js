@@ -1,7 +1,7 @@
 +function() {
   const searchResult = document.getElementById("plugin-search-result")
-  searchResult.textContent = 'Loading...'
-  fetchData('/search.xml').then(document => {
+  searchResult.textContent = 'not found...'
+  fetchData('/blog/search.xml').then(document => {
     const entries = analyzeData(document, getSearchQueryFromUrlParams())
     searchResult.innerHTML = makeSearchResult(entries)
   })
@@ -27,9 +27,9 @@
     const entries = document.getElementsByTagName('entry')
     const matchEntries = []
     for (var entry of entries) {
-      const regExp = new RegExp(query)
-      if (regExp.test(entry.children[0].textContent) ||
-          regExp.test(entry.children[2].textContent)) {
+      const regExp = new RegExp(decodeURI(query))
+      if (regExp.test(entry.querySelector('title').textContent) ||
+          regExp.test(entry.querySelector('content').textContent)) {
         matchEntries.push(entry)
       }
     }
@@ -40,9 +40,9 @@
     let innerHTML = ''
     for (let entry of entries) {
       innerHTML += '<div class="search-result-entry">'
-      const title = entry.children[0].textContent
-      const url = entry.children[1].textContent
-      const content = entry.children[2].textContent
+      const title = entry.querySelector('title').textContent
+      const url = entry.querySelector('url').textContent
+      const content = entry.querySelector('content').textContent
       innerHTML += '<h2><a href="' + url + '">' + title + '</a></h2>'
       const thumbnail = /<img[^>]*>/.exec(content)
       if (thumbnail && thumbnail.length >= 1) {
